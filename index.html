@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шахматный помощник</title>
+    <style>
+        :root {
+            --primary-color: #34495e;
+            --secondary-color: #2c3e50;
+            --accent-color: #f39c12;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: var(--light-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin: 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-color);
+            color: var(--primary-color);
+        }
+
+        h3 {
+            margin: 15px 0;
+            color: var(--secondary-color);
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        .tab-button:hover {
+            background-color: var(--accent-color);
+        }
+
+        .tab-button.active {
+            background-color: var(--accent-color);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .checklist {
+            list-style-type: none;
+            margin: 15px 0;
+        }
+
+        .checklist li {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--accent-color);
+            border-radius: 3px;
+        }
+
+        .checklist li strong {
+            color: var(--secondary-color);
+        }
+
+        .sub-checklist {
+            margin-top: 10px;
+            margin-left: 20px;
+            list-style-type: circle;
+        }
+
+        .sub-checklist li {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-left: 2px solid var(--success-color);
+        }
+
+        .opening {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .opening h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .principle {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--success-color);
+            border-radius: 3px;
+        }
+
+        .practice-section {
+            margin-top: 20px;
+        }
+
+        .practice-button {
+            padding: 10px 15px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .practice-button:hover {
+            background-color: #27ae60;
+        }
+
+        .tip-box {
+            background-color: rgba(243, 156, 18, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        .danger-tip {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .success-tip {
+            background-color: rgba(46, 204, 113, 0.1);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .quote {
+            font-style: italic;
+            color: #555;
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .phase-checklist {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .phase-card {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .phase-card h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab-button {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+        }
+
+        .accordion {
+            background-color: #f9f9f9;
+            color: var(--secondary-color);
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            text-align: left;
+            border: none;
+            outline: none;
+            transition: 0.4s;
+            margin-bottom: 5px;
+            font-weight: bold;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion:after {
+            content: '\002B';
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .active-accordion:after {
+            content: "\2212";
+        }
+
+        .panel {
+            padding: 0 18px;
+            background-color: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            margin-bottom: 10px;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .active-accordion {
+            background-color: #e9e9e9;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Шахматный помощник</h1>
+            <p>Улучшите свою игру с помощью проверенных стратегий и полезных чек-листов</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'checklist')">Чек-лист хода</button>
+            <button class="tab-button" onclick="openTab(event, 'openings')">Дебюты</button>
+            <button class="tab-button" onclick="openTab(event, 'principles')">Принципы игры</button>
+            <button class="tab-button" onclick="openTab(event, 'mistakes')">Типичные ошибки</button>
+            <button class="tab-button" onclick="openTab(event, 'study')">План обучения</button>
+        </div>
+
+        <div id="checklist" class="tab-content active">
+            <h2>Чек-лист для каждого хода</h2>
+            
+            <div class="quote">
+                "Шахматы – это не просто игра, а целое искусство, в котором каждый ход должен быть обдуман." — Анатолий Карпов
+            </div>
+            
+            <button class="accordion">1. Анализ позиции</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li><strong>Проверьте угрозы:</strong> Есть ли у соперника немедленные угрозы вашему королю или важным фигурам?
+                        <ul class="sub-checklist">
+                            <li>Проверьте все атаки на вашего короля</li>
+                            <li>Ищите фигуры под боем без защиты</li>
+                            <li>Обратите внимание на вилки и связки</li>
+                        </ul>
+                    </li>
+                    <li><strong>Оцените материальный баланс:</strong> Кто ведет по количеству и качеству фигур?</li>
+                    <li><strong>Где слабости в позиции соперника?</strong> Проанализируйте пешечную структуру, открытые линии, слабые поля.</li>
+                    <li><strong>Где ваши слабости?</strong> Какие ваши фигуры или поля нуждаются в защите?</li>
+                </ul>
+            </div>
+
+            <button class="accordion">2. Тактика</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li><strong>Ищите тактические возможности:</strong>
+                        <ul class="sub-checklist">
+                            <li>Можете ли вы поставить шах?</li>
+                            <li>Есть ли возможность для вилки или связки?</li>
+                            <li>Есть ли возможность для двойного удара?</li>
+                            <li>Можно ли создать вскрытое нападение?</li>
+                            <li>Есть ли возможность для жертвы с последующим выигрышем материала?</li>
+                        </ul>
+                    </li>
+                    <li><strong>Проверьте возможные комбинации</strong> на 2-3 хода вперед</li>
+                </ul>
+            </div>
+
+            <button class="accordion">3. Стратегия</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li><strong>Улучшение позиции фигур:</strong>
+                        <ul class="sub-checklist">
+                            <li>Какая фигура стоит менее активно?</li>
+                            <li>Можно ли улучшить её положение?</li>
+                            <li>Можно ли создать угрозу или занять важную точку?</li>
+                        </ul>
+                    </li>
+                    <li><strong>Контроль центра:</strong> Как изменится контроль над центром после вашего хода?</li>
+                    <li><strong>Пешечная структура:</strong> Не ослабит ли ваш ход пешечную структуру?</li>
+                    <li><strong>Безопасность короля:</strong> Если вы развиваете атаку, безопасен ли ваш король?</li>
+                </ul>
+            </div>
+
+            <button class="accordion">4. Если вас атакуют</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li><strong>Оцените серьезность угрозы:</strong>
+                        <ul class="sub-checklist">
+                            <li>Можно ли игнорировать угрозу и контратаковать?</li>
+                            <li>Нужно ли немедленно реагировать?</li>
+                        </ul>
+                    </li>
+                    <li><strong>Варианты защиты:</strong>
+                        <ul class="sub-checklist">
+                            <li>Можно ли защитить атакованную фигуру?</li>
+                            <li>Можно ли уйти с атакованного поля?</li>
+                            <li>Можно ли контратаковать более важную фигуру?</li>
+                            <li>Можно ли заблокировать атаку?</li>
+                        </ul>
+                    </li>
+                    <li><strong>Думайте о контригре</strong> даже при защите</li>
+                </ul>
+            </div>
+
+            <button class="accordion">5. Перед финальным ходом</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li><strong>Сделайте последнюю проверку:</strong>
+                        <ul class="sub-checklist">
+                            <li>Не подставляете ли вы свои фигуры под удар?</li>
+                            <li>Нет ли у соперника неожиданных ответов?</li>
+                            <li>Рассмотрели ли вы все возможные ответы соперника?</li>
+                        </ul>
+                    </li>
+                    <li><strong>Блиц-тест:</strong> Задайте себе вопрос "Почему этот ход лучший?"</li>
+                </ul>
+            </div>
+            
+            <div class="phase-checklist">
+                <div class="phase-card">
+                    <h3>Дебют</h3>
+                    <ul class="checklist">
+                        <li><strong>Развивайте фигуры</strong> к центру</li>
+                        <li><strong>Сделайте рокировку</strong> как можно раньше</li>
+                        <li><strong>Контролируйте центр</strong> (e4, d4, e5, d5)</li>
+                        <li><strong>Не выводите ферзя</strong> слишком рано</li>
+                        <li><strong>Соединяйте ладьи</strong></li>
+                    </ul>
+                </div>
+                
+                <div class="phase-card">
+                    <h3>Миттельшпиль</h3>
+                    <ul class="checklist">
+                        <li><strong>Создавайте план</strong> игры</li>
+                        <li><strong>Ищите тактические удары</strong></li>
+                        <li><strong>Улучшайте позиции худших фигур</strong></li>
+                        <li><strong>Используйте открытые линии</strong></li>
+                        <li><strong>Атакуйте слабости противника</strong></li>
+                    </ul>
+                </div>
+                
+                <div class="phase-card">
+                    <h3>Эндшпиль</h3>
+                    <ul class="checklist">
+                        <li><strong>Активизируйте короля</strong></li>
+                        <li><strong>Продвигайте проходные пешки</strong></li>
+                        <li><strong>Централизуйте фигуры</strong></li>
+                        <li><strong>Создавайте отдаленные проходные</strong></li>
+                        <li><strong>Помните правило квадрата</strong> для пешек</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                <h3>Совет:</h3>
+                <p>Перед каждым ходом спросите себя: "Что изменилось в позиции после хода соперника? Какие возможности это создает для меня?"</p>
+            </div>
+        </div>
+
+        <div id="openings" class="tab-content">
+            <h2>Основные дебюты для начинающих</h2>
+            
+            <div class="quote">
+                "Задача дебюта – не просто развитие фигур, а борьба за инициативу и контроль центра." — Гарри Каспаров
+            </div>
+            
+            <h3>За белых</h3>
+            
+            <div class="opening">
+                <h4>1. Испанская партия (Дебют Рюи Лопеса)</h4>
+                <p><strong>Ходы:</strong> 1.e4 e5 2.Nf3 Nc6 3.Bb5</p>
+                <p><strong>Идея:</strong> Белые атакуют коня, защищающего пешку e5, создавая давление в центре.</p>
+                <p><strong>Преимущества:</strong> Надежный дебют, с хорошими перспективами атаки и гибкими планами.</p>
+            </div>
+            
+            <div class="opening">
+                <h4>2. Итальянская партия</h4>
+                <p><strong>Ходы:</strong> 1.e4 e5 2.Nf3 Nc6 3.Bc4</p>
+                <p><strong>Идея:</strong> Быстрое развитие с давлением на поле f7 и подготовкой к рокировке.</p>
+                <p><strong>Преимущества:</strong> Открытые линии, быстрое развитие, возможности для тактических ударов.</p>
+            </div>
+            
+            <div class="opening">
+                <h4>3. Дебют четырех коней</h4>
+                <p><strong>Ходы:</strong> 1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6</p>
+                <p><strong>Идея:</strong> Быстрое развитие всех легких фигур с контролем центра.</p>
+                <p><strong>Преимущества:</strong> Симметричная позиция, отличный выбор для начинающих, так как он базируется на основных принципах дебюта.</p>
+            </div>
+            
+            <div class="opening">
+                <h4>4. Дебют ферзевых пешек</h4>
+                <p><strong>Ходы:</strong> 1.d4 d5 2.c4</p>
+                <p><strong>Идея:</strong> Борьба за центр с фланговой атакой пешки d5.</p>
+                <p><strong>Преимущества:</strong> Прочная позиция, перспективы атаки на ферзевом фланге.</p>
+            </div>
+            
+            <h3>За черных</h3>
+            
+            <div class="opening">
+                <h4>1. Сицилианская защита</h4>
+                <p><strong>Ходы:</strong> 1.e4 c5</p>
+                <p><strong>Идея:</strong> Асимметричная борьба за центр, подготовка к контратаке.</p>
+                <p><strong>Преимущества:</strong> Высокий потенциал контратаки, дисбаланс в центре, богатые тактические возможности.</p>
+            </div>
+            
+            <div class="opening">
+                <h4>2. Французская защита</h4>
+                <p><strong>Ходы:</strong> 1.e4 e6 2.d4 d5</p>
+                <p><strong>Идея:</strong> Солидная оборона с перспективами контригры в центре.</p>
+                <p><strong>Преимущества:</strong> Прочная пешечная структура, ясные планы игры.</p>
+            </div>
+            
+            <div class="opening">
+                <h4>3. Защита Каро-Канн</h4>
+                <p><strong>Ходы:</strong> 1.e4 c6 2.d4 d5</p>
+                <p><strong>Идея:</strong> Создание прочной пешечной структуры перед развитием фигур.</p>
+                <p><strong>Преимущества:</strong> Солидная и надежная защита, меньше теории для изучения.</p>
+            </div>
+            
+            <div class="tip-box success-tip">
+                <h3>Советы по дебютам:</h3>
+                <ul>
+                    <li>Изучайте идеи дебютов, а не только последовательности ходов</li>
+                    <li>Начните с 1-2 дебютов за белых и 1-2 за черных</li>
+                    <li>Анализируйте свои партии, чтобы понять, где вы допускаете ошибки в дебюте</li>
+                    <li>Помните основные принципы: контроль центра, развитие фигур, безопасность короля</li>
+                </ul>
+            </div>
+            
+            <div class="tip-box danger-tip">
+                <h3>Частые ошибки в дебюте:</h3>
+                <ul>
+                    <li>Ходить одной и той же фигурой несколько раз</li>
+                    <li>Выводить ферзя слишком рано</li>
+                    <li>Не делать рокировку</li>
+                    <li>Преждевременные атаки</li>
+                    <li>Излишние пешечные ходы</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="principles" class="tab-content">
+            <h2>Принципы шахматной игры</h2>
+            
+            <div class="quote">
+                "Шахматы — это борьба против собственных ошибок." — Савелий Тартаковер
+            </div>
+            
+            <h3>Общие принципы</h3>
+            
+            <div class="principle">
+                <h4>1. Контроль центра</h4>
+                <p>Контроль центральных полей (e4, d4, e5, d5) даёт вашим фигурам больше мобильности и возможностей для атаки.</p>
+                <p><strong>Как применять:</strong> Продвигайте центральные пешки, развивайте фигуры с прицелом на центр, не допускайте вражеского контроля над центром.</p>
+            </div>
+            
+            <div class="principle">
+                <h4>2. Развитие фигур</h4>
+                <p>Быстрое и гармоничное развитие фигур создает перевес в активности и возможности для атаки.</p>
+                <p><strong>Как применять:</strong> Развивайте фигуры к центру, не ходите одной фигурой несколько раз в дебюте, развивайте коней перед слонами, если нет веских причин делать иначе.</p>
+            </div>
+            
+            <div class="principle">
+                <h4>3. Безопасность короля</h4>
+                <p>Король — самая важная фигура, которую нужно защищать на протяжении всей партии.</p>
+                <p><strong>Как применять:</strong> Делайте рокировку в первые 10 ходов, избегайте ослабления пешечной структуры вокруг короля, всегда оценивайте безопасность короля при планировании атаки.</p>
+            </div>
+            
+            <div class="principle">
+                <h4>4. Пешечная структура</h4>
+                <p>Пешки определяют "скелет" позиции и влияют на план игры.</p>
+                <p><strong>Как применять:</strong> Избегайте сдвоенных и изолированных пешек без компенсации, создавайте проходные пешки, занимайте пешками важные поля.</p>
+            </div>
+            
+            <div class="principle">
+                <h4>5. Взаимодействие фигур</h4>
+                <p>Шахматы — командная игра, где ценность фигур умножается при их взаимодействии.</p>
+                <p><strong>Как применять:</strong> Располагайте фигуры так, чтобы они поддерживали друг друга, стремитесь к созданию координированных атак, избегайте размена активных фигур на пассивные.</p>
+            </div>
+            
+            <h3>Принципы для разных стадий игры</h3>
+            
+            <button class="accordion">Принципы дебюта</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li><strong>Контролируйте центр</strong> пешками или фигурами</li>
+                    <li><strong>Развивайте легкие фигуры</strong> перед тяжелыми</li>
+                    <li><strong>Сделайте рокировку</strong> как можно раньше</li>
+                    <li><strong>Не двигайте одну и ту же фигуру дважды</strong> без явной необходимости</li>
+                    <li><strong>Не выводите ферзя слишком рано</strong>, чтобы не подвергать его атакам</li>
+                    <li><strong>Соединяйте ладьи</strong>, обеспечивая им взаимную поддержку</li>
+                    <li><strong>Избегайте ненужных пешечных ходов</strong>, которые ослабляют позицию</li>
+                </ul>
+            </div>
+            
+            <button class="accordion">Принципы миттельшпиля</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li><strong>Создавайте и исполняйте план</strong>, соответствующий характеру позиции</li>
+                    <li><strong>Активизируйте фигуры</strong>, особенно те, которые не участвуют в игре</li>
+                    <li><strong>Создавайте угрозы</strong>, которые вынуждают соперника реагировать</li>
+                    <li><strong>Атакуйте слабости противника</strong> — изолированные пешки, отсталые пешки, слабые поля</li>
+                    <li><strong>Используйте открытые линии</strong> для ладей и диагонали для слонов</li>
+                    <li><strong>Избегайте размена активных фигур</strong> на пассивные фигуры противника</li>
+                    <li><strong>Усиливайте позицию перед атакой</strong>, подтягивая все доступные силы</li>
+                    <li><strong>Ищите тактические возможности</strong> — вилки, связки, открытые нападения</li>
+                </ul>
+            </div>
+            
+            <button class="accordion">Принципы эндшпиля</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li><strong>Активизируйте короля</strong> — в эндшпиле король становится сильной фигурой</li>
+                    <li><strong>Проводите пешки в ферзи</strong> — создавайте и поддерживайте проходные пешки</li>
+                    <li><strong>Централизуйте фигуры</strong>, особенно короля</li>
+                    <li><strong>Создавайте отдаленные проходные пешки</strong>, чтобы растянуть оборону противника</li>
+                    <li><strong>Блокируйте проходные пешки противника</strong> фигурами</li>
+                    <li><strong>Используйте принцип оппозиции</strong> в пешечных эндшпилях</li>
+                    <li><strong>Знайте теоретически выигрышные и ничейные позиции</strong> (например, позиции "треугольник" или "мост Лусены")</li>
+                    <li><strong>Рассчитывайте варианты до конца</strong>, особенно в простых позициях</li>
+                </ul>
+            </div>
+            
+            <div class="tip-box">
+                <h3>Правило "ТИПС" для каждого хода:</h3>
+                <ul>
+                    <li><strong>Т</strong>актика: Есть ли немедленные тактические возможности?</li>
+                    <li><strong>И</strong>нициатива: Как сохранить или захватить инициативу?</li>
+                    <li><strong>П</strong>озиция: Улучшит ли ход позицию моих фигур?</li>
+                    <li><strong>С</strong>лабости: Создает ли ход слабости или использует слабости противника?</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="mistakes" class="tab-content">
+            <h2>Типичные ошибки и как их избегать</h2>
+            
+            <div class="quote">
+                "Я могу простить даже проигрыш, но не ошибку, которую не извлек и не проанализировал." — Александр Алехин
+            </div>
+            
+            <button class="accordion">Ошибки в дебюте</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li>
+                        <strong>Ошибка: Ходить много раз одной фигурой</strong>
+                        <p>Это замедляет общее развитие и дает сопернику преимущество во времени.</p>
+                        <p><strong>Решение:</strong> Следуйте принципу "одна фигура - один ход" в дебюте, пока не разовьете большинство фигур.</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Раннее выведение ферзя</strong>
+                        <p>Ферзь может стать объектом атаки, что вынудит вас тратить время на его защиту.</p>
+                        <p><strong>Решение:</strong> Сначала развивайте легкие фигуры (кони, слоны), делайте рокировку, и только потом выводите ферзя.</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Игнорирование центра</strong>
+                        <p>Отказ от борьбы за центр часто приводит к стесненной позиции и проблемам с развитием.</p>
+                        <p><strong>Решение:</strong> Стремитесь контролировать центр пешками или фигурами в начале партии.</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Откладывание рокировки</strong>
+                        <p>Оставление короля в центре подвергает его опасности.</p>
+                        <p><strong>Решение:</strong> Делайте рокировку как можно раньше, обычно в первые 7-10 ходов.</p>
+                    </li>
+                </ul>
+            </div>
+            
+            <button class="accordion">Ошибки в миттельшпиле</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li>
+                        <strong>Ошибка: Отсутствие плана</strong>
+                        <p>Бесцельные ходы ведут к потере инициативы и преимущества.</p>
+                        <p><strong>Решение:</strong> Оценивайте позицию и формируйте план, основанный на ее особенностях (атака на короля, давление на слабости и т.д.).</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Игнорирование угроз соперника</strong>
+                        <p>Сосредоточенность только на своих планах может привести к пропуску тактических ударов.</p>
+                        <p><strong>Решение:</strong> После каждого хода соперника спрашивайте себя: "Что изменилось? Какие угрозы появились?"</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Преждевременная атака</strong>
+                        <p>Атака без достаточной подготовки может быть легко отбита и привести к контратаке.</p>
+                        <p><strong>Решение:</strong> Перед атакой убедитесь, что у вас достаточно сил в зоне атаки и что ваш король в безопасности.</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Обмен хороших фигур на плохие</strong>
+                        <p>Размен активной фигуры на пассивную фигуру противника ухудшает вашу позицию.</p>
+                        <p><strong>Решение:</strong> Оценивайте не только материальную ценность фигур, но и их активность в конкретной позиции.</p>
+                    </li>
+                </ul>
+            </div>
+            
+            <button class="accordion">Ошибки в эндшпиле</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li>
+                        <strong>Ошибка: Пассивный король</strong>
+                        <p>В эндшпиле король должен быть активной фигурой.</p>
+                        <p><strong>Решение:</strong> Вводите короля в игру, особенно для поддержки проходных пешек или блокирования пешек противника.</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Неправильный размен</strong>
+                        <p>Некоторые размены могут превратить выигрышную позицию в ничью или даже проигрыш.</p>
+                        <p><strong>Решение:</strong> Тщательно оценивайте последствия каждого размена в эндшпиле и просчитывайте варианты до конца.</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Спешка</strong>
+                        <p>Многие эндшпили требуют точного расчета и терпения.</p>
+                        <p><strong>Решение:</strong> Не торопитесь, рассчитывайте варианты до конца и будьте терпеливы в реализации преимущества.</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Незнание теоретических позиций</strong>
+                        <p>Незнание базовых эндшпильных позиций может стоить вам очков.</p>
+                        <p><strong>Решение:</strong> Изучите основные теоретические эндшпили (например, оппозиция, правило квадрата, ладья против пешки).</p>
+                    </li>
+                </ul>
+            </div>
+            
+            <button class="accordion">Психологические ошибки</button>
+            <div class="panel">
+                <ul class="checklist">
+                    <li>
+                        <strong>Ошибка: Игра на автопилоте</strong>
+                        <p>Ходы без глубокого анализа часто приводят к просмотрам и упущенным возможностям.</p>
+                        <p><strong>Решение:</strong> Для каждого хода выделяйте время на анализ. Используйте чек-лист.</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Недооценка соперника</strong>
+                        <p>Это приводит к небрежности и пропуску угроз.</p>
+                        <p><strong>Решение:</strong> Относитесь к каждому сопернику с уважением и всегда играйте внимательно.</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Игра на результат, а не на качество</strong>
+                        <p>Чрезмерная концентрация на исходе партии мешает принимать объективные решения.</p>
+                        <p><strong>Решение:</strong> Сосредоточьтесь на поиске лучших ходов, а не на результате партии.</p>
+                    </li>
+                    <li>
+                        <strong>Ошибка: Расстройство из-за ошибок</strong>
+                        <p>Эмоциональная реакция на ошибку может привести к череде новых ошибок.</p>
+                        <p><strong>Решение:</strong> Воспринимайте ошибки как возможность для обучения. После плохого хода сосредоточьтесь на том, чтобы найти лучший ход в новой позиции.</p>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="tip-box danger-tip">
+                <h3>Самые дорогостоящие ошибки:</h3>
+                <ol>
+                    <li>Зевки (пропуск очевидных угроз или возможностей)</li>
+                    <li>Неправильная оценка размена</li>
+                    <li>Игнорирование развития в дебюте</li>
+                    <li>Преждевременные атаки без достаточной поддержки</li>
+                    <li>Пассивная игра, предоставляющая инициативу сопернику</li>
+                </ol>
+            </div>
+            
+            <div class="tip-box success-tip">
+                <h3>Как учиться на своих ошибках:</h3>
+                <ol>
+                    <li>После каждой партии проводите анализ с шахматным движком</li>
+                    <li>Записывайте типичные ошибки в свой шахматный дневник</li>
+                    <li>Перед следующей партией просматривайте свои заметки об ошибках</li>
+                    <li>Решайте шахматные задачи, которые помогают избегать подобных ошибок</li>
+                    <li>Будьте честны с собой и признавайте ошибки, чтобы прогрессировать</li>
+                </ol>
+            </div>
+        </div>
+
+        <div id="study" class="tab-content">
+            <h2>План обучения шахматам</h2>
+            
+            <div class="quote">
+                "Хороший план сегодня лучше идеального плана завтра." — Гарри Каспаров
+            </div>
+            
+            <h3>Этапы обучения</h3>
+            
+            <button class="accordion">Начальный уровень (Эло до 1200)</button>
+            <div class="panel">
+                <h4>Приоритеты обучения:</h4>
+                <ul class="checklist">
+                    <li>
+                        <strong>Основы тактики:</strong>
+                        <ul class="sub-checklist">
+                            <li>Вилки, связки, открытые нападения</li>
+                            <li>Двойной удар, отвлечение, завлечение</li>
+                            <li>Решайте простые тактические задачи ежедневно (10-15 минут)</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Базовые принципы дебюта:</strong>
+                        <ul class="sub-checklist">
+                            <li>Контроль центра, развитие фигур, безопасность короля</li>
+                            <li>Изучите 1-2 простых дебюта за белых и за черных</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Элементарные эндшпили:</strong>
+                        <ul class="sub-checklist">
+                            <li>Король и ферзь против короля</li>
+                            <li>Король и ладья против короля</li>
+                            <li>Правило квадрата и оппозиция в пешечных эндшпилях</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Профилактика грубых ошибок:</strong>
+                        <ul class="sub-checklist">
+                            <li>Тренируйте "шахматное зрение" - видение угроз и возможностей</li>
+                            <li>Практикуйте чек-лист перед каждым ходом</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h4>Практика:</h4>
+                <ul>
+                    <li>Играйте медленные партии (минимум 15+10) для развития мышления</li>
+                    <li>Анализируйте свои партии, фокусируясь на грубых ошибках</li>
+                    <li>Решайте тактические головоломки в приложениях (Chess.com, Lichess, ChessTempo)</li>
+                </ul>
+            </div>
+            
+            <button class="accordion">Средний уровень (Эло 1200-1600)</button>
+            <div class="panel">
+                <h4>Приоритеты обучения:</h4>
+                <ul class="checklist">
+                    <li>
+                        <strong>Углубленная тактика:</strong>
+                        <ul class="sub-checklist">
+                            <li>Комбинации на 3-4 хода вперед</li>
+                            <li>Сложные тактические мотивы (перекрытие, промежуточный ход)</li>
+                            <li>Решайте задачи средней сложности (20-30 минут в день)</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Дебютный репертуар:</strong>
+                        <ul class="sub-checklist">
+                            <li>Расширьте репертуар до 2-3 дебютов за белых и за черных</li>
+                            <li>Изучайте типовые планы и идеи, а не только последовательности ходов</li>
+                            <li>Анализируйте свои дебютные ошибки</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Стратегические концепции:</strong>
+                        <ul class="sub-checklist">
+                            <li>Пешечные структуры и их влияние на план игры</li>
+                            <li>Выгодные и невыгодные размены</li>
+                            <li>Оценка позиции и формирование плана</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Практические эндшпили:</strong>
+                        <ul class="sub-checklist">
+                            <li>Король и пешка против короля</li>
+                            <li>Ладейные эндшпили</li>
+                            <li>Разнофигурные эндшпили (слон против коня)</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h4>Практика:</h4>
+                <ul>
+                    <li>Играйте в турнирах или лигах для получения опыта против разных соперников</li>
+                    <li>Анализируйте партии с шахматным движком</li>
+                    <li>Изучайте классические партии великих шахматистов</li>
+                    <li>Начните вести шахматный дневник для отслеживания прогресса</li>
+                </ul>
+            </div>
+            
+            <button class="accordion">Продвинутый уровень (Эло 1600+)</button>
+            <div class="panel">
+                <h4>Приоритеты обучения:</h4>
+                <ul class="checklist">
+                    <li>
+                        <strong>Сложная тактика и расчет:</strong>
+                        <ul class="sub-checklist">
+                            <li>Тренировка расчета вариантов на 5+ ходов</li>
+                            <li>Сложные комбинации с жертвами и неочевидными решениями</li>
+                            <li>Тренируйте "слепой" расчет без передвижения фигур</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Глубокая дебютная подготовка:</strong>
+                        <ul class="sub-checklist">
+                            <li>Понимание нюансов и критических позиций в ваших дебютах</li>
+                            <li>Изучение актуальных дебютных новинок</li>
+                            <li>Создание персональной дебютной базы данных</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Динамическое понимание позиции:</strong>
+                        <ul class="sub-checklist">
+                            <li>Баланс между материалом, временем и пространством</li>
+                            <li>Инициатива и компенсация</li>
+                            <li>Переход между стадиями партии (дебют-миттельшпиль-эндшпиль)</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Сложные эндшпили:</strong>
+                        <ul class="sub-checklist">
+                            <li>Теоретические позиции в ладейных эндшпилях</li>
+                            <li>Эндшпили с разным материалом</li>
+                            <li>Понимание тонких нюансов в эндшпиле</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h4>Практика:</h4>
+                <ul>
+                    <li>Работайте с тренером для выявления и устранения слабых сторон</li>
+                    <li>Анализируйте свои партии без помощи движка, затем сравнивайте с анализом движка</li>
+                    <li>Участвуйте в серьезных турнирах с классическим контролем времени</li>
+                    <li>Изучайте партии и творчество шахматистов с похожим стилем игры</li>
+                </ul>
+            </div>
+            
+            <h3>Рекомендуемые ресурсы</h3>
+            
+            <div class="accordion">Книги</div>
+            <div class="panel">
+                <h4>Для начинающих:</h4>
+                <ul>
+                    <li>"Шахматы для детей" - Мюррей Чандлер</li>
+                    <li>"Учебник шахматной игры" - Эмануил Ласкер</li>
+                    <li>"Путь к шахматному мастерству" - Марк Дворецкий</li>
+                </ul>
+                <h4>Для среднего уровня:</h4>
+                <ul>
+                    <li>"Шахматные комбинации" - Ласло Полгар</li>
+                    <li>"Моя система" - Арон Нимцович</li>
+                    <li>"Шахматная стратегия для начинающих" - Джон Нанн</li>
+                </ul>
+                <h4>Для продвинутых:</h4>
+                <ul>
+                    <li>"Искусство анализа" - Гарри Каспаров</li>
+                    <li>"Позиционная игра" - Марк Дворецкий</li>
+                    <li>"Эндшпиль" - Юрий Авербах</li>
+                </ul>
+            </div>
+            
+            <div class="accordion">Онлайн-ресурсы</div>
+            <div class="panel">
+                <h4>Шахматные платформы:</h4>
+                <ul>
+                    <li>Chess.com - игра онлайн, уроки, задачи, анализ</li>
+                    <li>Lichess.org - бесплатная платформа с множеством обучающих ресурсов</li>
+                    <li>ChessTempo.com - специализируется на тактических головоломках</li>
+                </ul>
+                <h4>YouTube-каналы:</h4>
+                <ul>
+                    <li>GothamChess - доступные уроки для начинающих и любителей</li>
+                    <li>ChessNetwork - подробные разборы партий и тактических ситуаций</li>
+                    <li>Агадмадор - тактические головоломки и исторические партии</li>
+                    <li>Kingscrusher - глубокий анализ стратегических идей</li>
+                </ul>
+                <h4>Базы данных и анализ:</h4>
+                <ul>
+                    <li>ChessBase - профессиональная база данных шахматных партий</li>
+                    <li>SCID - бесплатная альтернатива ChessBase</li>
+                    <li>365Chess.com - онлайн-база данных партий</li>
+                </ul>
+            </div>
+            
+            <div class="accordion">Тренировочный план на неделю</div>
+            <div class="panel">
+                <ul class="checklist">
+                    <li>
+                        <strong>Понедельник: Тактика</strong>
+                        <ul class="sub-checklist">
+                            <li>30 минут решения тактических задач</li>
+                            <li>Анализ 2-3 своих предыдущих партий, фокусируясь на тактических моментах</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Вторник: Дебюты</strong>
+                        <ul class="sub-checklist">
+                            <li>Изучение одного дебютного варианта (20-30 минут)</li>
+                            <li>Игра 2-3 тренировочных партий с этим дебютом</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Среда: Стратегия</strong>
+                        <ul class="sub-checklist">
+                            <li>Изучение образцовой партии великого шахматиста</li>
+                            <li>Практика оценки позиций и формирования плана</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Четверг: Эндшпиль</strong>
+                        <ul class="sub-checklist">
+                            <li>Изучение одного типа эндшпиля (20-30 минут)</li>
+                            <li>Практика игры в изученных эндшпильных позициях</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Пятница: Свободная игра</strong>
+                        <ul class="sub-checklist">
+                            <li>Игра 3-5 партий с анализом после каждой</li>
+                            <li>Применение изученного в течение недели</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Суббота и Воскресенье</strong>
+                        <ul class="sub-checklist">
+                            <li>Участие в онлайн-турнире или игра длинных партий</li>
+                            <li>Решение сложных шахматных задач для развития мышления</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="tip-box success-tip">
+                <h3>Ключевые советы для прогресса:</h3>
+                <ol>
+                    <li><strong>Постоянство важнее интенсивности</strong> - лучше заниматься понемногу каждый день, чем много раз в неделю</li>
+                    <li><strong>Анализируйте свои партии</strong> - это важнейший инструмент развития</li>
+                    <li><strong>Учитесь на поражениях</strong> - они часто дают больше уроков, чем победы</li>
+                    <li><strong>Не фокусируйтесь только на рейтинге</strong> - концентрируйтесь на качестве игры</li>
+                    <li><strong>Получайте удовольствие от процесса</strong> - шахматы должны оставаться радостью, а не только работой</li>
+                </ol>
+            </div>
+            
+            <div class="practice-section">
+                <h3>Проверьте свои знания</h3>
+                <p>Готовы проверить, как хорошо вы усвоили материал? Попробуйте пройти небольшой тест!</p>
+                <button class="practice-button" onclick="startQuiz()">Начать тест</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Шахматный помощник © 2023 | Улучшайте свою игру день за днем</p>
+    </footer>
+
+    <script>
+        // Управление вкладками
+        function openTab(evt, tabName) {
+            let i, tabContent, tabButtons;
+            
+            // Скрыть все вкладки
+            tabContent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabContent.length; i++) {
+                tabContent[i].classList.remove("active");
+            }
+            
+            // Деактивировать все кнопки
+            tabButtons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            // Показать текущую вкладку и активировать кнопку
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // Управление аккордеонами
+        document.addEventListener('DOMContentLoaded', function() {
+            const accordions = document.getElementsByClassName("accordion");
+            
+            for (let i = 0; i < accordions.length; i++) {
+                accordions[i].addEventListener("click", function() {
+                    this.classList.toggle("active-accordion");
+                    
+                    const panel = this.nextElementSibling;
+                    if (panel.style.maxHeight) {
+                        panel.style.maxHeight = null;
+                    } else {
+                        panel.style.maxHeight = panel.scrollHeight + "px";
+                    }
+                });
+            }
+        });
+        
+        // Тест по шахматам
+        const quizQuestions = [
+            {
+                question: "Какой принцип является наиболее важным в дебюте?",
+                options: [
+                    "Развитие фигур и контроль центра",
+                    "Атака на короля противника",
+                    "Продвижение пешек на фланге",
+                    "Фокус на материальном преимуществе"
+                ],
+                correct: 0
+            },
+            {
+                question: "Что следует проверить перед каждым ходом?",
+                options: [
+                    "Только возможности атаки",
+                    "Только материальный баланс",
+                    "Угрозы соперника, тактические возможности и общий план",
+                    "Только продвижение пешек"
+                ],
+                correct: 2
+            },
+            {
+                question: "Какой принцип эндшпиля верен?",
+                options: [
+                    "Король должен оставаться в укрытии",
+                    "Король должен быть активной фигурой",
+                    "Ладьи не важны в эндшпиле",
+                    "Пешки не играют решающей роли"
+                ],
+                correct: 1
+            },
+            {
+                question: "Что такое 'вилка' в шахматах?",
+                options: [
+                    "Защита двух фигур одновременно",
+                    "Атака на короля и ферзя",
+                    "Атака на две или более фигуры одновременно",
+                    "Тип рокировки"
+                ],
+                correct: 2
+            },
+            {
+                question: "Что наиболее важно при атаке на короля противника?",
+                options: [
+                    "Количество атакующих фигур",
+                    "Скорость атаки",
+                    "Безопасность собственного короля",
+                    "Жертва материала"
+                ],
+                correct: 2
+            }
+        ];
+        
+        let currentQuestion = 0;
+        let score = 0;
+        
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            
+            // Создаем модальное окно для теста
+            const quizModal = document.createElement('div');
+            quizModal.style.position = 'fixed';
+            quizModal.style.top = '0';
+            quizModal.style.left = '0';
+            quizModal.style.width = '100%';
+            quizModal.style.height = '100%';
+            quizModal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+            quizModal.style.display = 'flex';
+quizModal.style.justifyContent = 'center';
+            quizModal.style.alignItems = 'center';
+            quizModal.style.zIndex = '1000';
+            
+            const quizContainer = document.createElement('div');
+            quizContainer.style.backgroundColor = 'white';
+            quizContainer.style.padding = '30px';
+            quizContainer.style.borderRadius = '10px';
+            quizContainer.style.width = '80%';
+            quizContainer.style.maxWidth = '600px';
+            quizContainer.style.maxHeight = '80vh';
+            quizContainer.style.overflowY = 'auto';
+            quizContainer.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+            
+            quizModal.appendChild(quizContainer);
+            document.body.appendChild(quizModal);
+            
+            showQuestion();
+            
+            // Закрытие модального окна при клике вне контейнера
+            quizModal.addEventListener('click', function(e) {
+                if (e.target === quizModal) {
+                    document.body.removeChild(quizModal);
+                }
+            });
+        }
+        
+        function showQuestion() {
+            // Проверка завершения теста
+            if (currentQuestion >= quizQuestions.length) {
+                showResults();
+                return;
+            }
+            
+            const quizContainer = document.querySelector('body > div:last-child > div');
+            const question = quizQuestions[currentQuestion];
+            
+            let content = `
+                <h3>Вопрос ${currentQuestion + 1} из ${quizQuestions.length}</h3>
+                <div style="margin: 20px 0; font-size: 18px; font-weight: bold;">${question.question}</div>
+                <div id="options" style="margin-bottom: 20px;">
+            `;
+            
+            for (let i = 0; i < question.options.length; i++) {
+                content += `
+                    <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;" 
+                         onclick="selectAnswer(${i})">
+                        ${question.options[i]}
+                    </div>
+                `;
+            }
+            
+            content += `</div>`;
+            quizContainer.innerHTML = content;
+        }
+        
+        function selectAnswer(optionIndex) {
+            const question = quizQuestions[currentQuestion];
+            const options = document.querySelectorAll('#options > div');
+            
+            // Отключаем дальнейшие клики
+            for (let i = 0; i < options.length; i++) {
+                options[i].style.pointerEvents = 'none';
+            }
+            
+            // Подсвечиваем правильный и выбранный ответы
+            if (optionIndex === question.correct) {
+                options[optionIndex].style.backgroundColor = 'rgba(46, 204, 113, 0.2)';
+                options[optionIndex].style.borderColor = '#2ecc71';
+                score++;
+            } else {
+                options[optionIndex].style.backgroundColor = 'rgba(231, 76, 60, 0.2)';
+                options[optionIndex].style.borderColor = '#e74c3c';
+                options[question.correct].style.backgroundColor = 'rgba(46, 204, 113, 0.2)';
+                options[question.correct].style.borderColor = '#2ecc71';
+            }
+            
+            // Добавляем кнопку "Далее"
+            const quizContainer = document.querySelector('body > div:last-child > div');
+            const nextButton = document.createElement('button');
+            nextButton.innerText = 'Далее';
+            nextButton.style.padding = '10px 20px';
+            nextButton.style.backgroundColor = 'var(--accent-color)';
+            nextButton.style.color = 'white';
+            nextButton.style.border = 'none';
+            nextButton.style.borderRadius = '5px';
+            nextButton.style.cursor = 'pointer';
+            nextButton.style.fontSize = '16px';
+            nextButton.style.marginTop = '10px';
+            
+            nextButton.addEventListener('click', function() {
+                currentQuestion++;
+                showQuestion();
+            });
+            
+            quizContainer.appendChild(nextButton);
+        }
+        
+        function showResults() {
+            const quizContainer = document.querySelector('body > div:last-child > div');
+            
+            let resultMessage;
+            const percentage = (score / quizQuestions.length) * 100;
+            
+            if (percentage >= 80) {
+                resultMessage = 'Отлично! Вы отлично разбираетесь в шахматах!';
+            } else if (percentage >= 60) {
+                resultMessage = 'Хорошо! У вас есть хорошее понимание шахмат.';
+            } else {
+                resultMessage = 'Стоит еще немного поучиться. Продолжайте развиваться!';
+            }
+            
+            quizContainer.innerHTML = `
+                <h3>Результаты теста</h3>
+                <div style="margin: 20px 0; font-size: 24px; font-weight: bold; text-align: center;">
+                    ${score} из ${quizQuestions.length} правильных ответов (${percentage}%)
+                </div>
+                <div style="margin: 20px 0; text-align: center;">
+                    ${resultMessage}
+                </div>
+                <button id="closeQuiz" style="padding: 10px 20px; background-color: var(--accent-color); color: white; 
+                                              border: none; border-radius: 5px; cursor: pointer; font-size: 16px; display: block; 
+                                              margin: 20px auto;">
+                    Закрыть
+                </button>
+            `;
+            
+            document.getElementById('closeQuiz').addEventListener('click', function() {
+                const modal = document.querySelector('body > div:last-child');
+                document.body.removeChild(modal);
+            });
+        }
+
+        // Функция для случайных советов по шахматам
+        const chessAdvices = [
+            "Всегда смотрите на доску глазами соперника, чтобы предвидеть его планы.",
+            "После хода соперника сначала ищите тактические угрозы, затем думайте о стратегии.",
+            "В сложных позициях составьте список возможных кандидатов на ход и анализируйте их по очереди.",
+            "Стремитесь улучшать позицию вашей худшей фигуры.",
+            "В равных эндшпилях активный король дает значительное преимущество.",
+            "Избегайте ходов пешками перед своим королем в миттельшпиле.",
+            "Всегда стремитесь к активной позиции, даже при защите.",
+            "Запоминайте типичные тактические мотивы и ищите их в своих партиях.",
+            "Тренируйте расчет вариантов без передвижения фигур.",
+            "Если не видите выигрывающего плана, улучшайте позицию худшей фигуры."
+        ];
+
+        // Добавляем случайный совет при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Добавление случайного совета дня
+            const randomAdvice = chessAdvices[Math.floor(Math.random() * chessAdvices.length)];
+            const adviceBox = document.createElement('div');
+            adviceBox.className = 'tip-box';
+            adviceBox.innerHTML = `<h3>Совет дня:</h3><p>${randomAdvice}</p>`;
+            
+            // Вставляем после заголовка на первой вкладке
+            const firstTab = document.getElementById('checklist');
+            const firstH2 = firstTab.querySelector('h2');
+            firstTab.insertBefore(adviceBox, firstH2.nextSibling);
+        });
+    </script>
+</body>
+</html>
